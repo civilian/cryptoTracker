@@ -16,7 +16,7 @@ const CoinStack = () => {
                 component={CoinsScreen} 
             />
             <Stack.Screen 
-                name="Coin Detail" 
+                name="CoinDetail" 
                 component={CoinDetailScreen}
             />
         </Stack.Navigator>
