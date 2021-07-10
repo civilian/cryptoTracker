@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { View, Image, Text, SectionList, StyleSheet } from 'react-native';
+import { View, Image, Text, SectionList, FlatList, StyleSheet } from 'react-native';
 import colors from '../../res/colors';
+import Http from '../../libs/http';
+import CoinMarketItem from './CoinMarketItem';
 
 class CoinDetailScreen extends Component {
 
@@ -33,16 +35,26 @@ class CoinDetailScreen extends Component {
         return sections;
     }
 
+    getMarkets = async (coinId) => {
+        const url = `https://api.coinlore.net/api/coin/markets/?id=${coinId}`;
+
+        const markets = await Http.instance.get(url);
+
+        this.setState({ markets });
+    }
+
     componentDidMount(){
         const { coin } = this.props.route.params;
 
         this.props.navigation.setOptions({ title: coin.symbol });
 
+        this.getMarkets(coin.id);
+
         this.setState({ coin });
     }
 
     render() {
-        const { coin } = this.state;
+        const { coin, markets } = this.state;
 
         return (
             <View style={styles.container}>
@@ -67,6 +79,15 @@ class CoinDetailScreen extends Component {
                         <Text style={styles.sectionText}>{section.title}</Text>
                         </View>
                         }
+                />
+
+                <Text style={styles.marketsTitle}>Markets</Text>
+                <FlatList
+                    style={styles.list}
+                    horizontal={true}
+                    data={markets}
+                    renderItem={({item})=> <CoinMarketItem item={item} />}
+                    keyExtractor={(item, index) => index.toString()}
                 />
             </View>
         )
@@ -116,6 +137,13 @@ const styles = StyleSheet.create({
         color: colors.white,
         fontSize: 14,
         fontWeight: "bold"
+    },
+    marketsTitle: {
+        color: colors.white,
+        fontSize: 16,
+        fontWeight: "bold",
+        marginBottom: 16,
+        marginLeft: 16
     },
 })
 
